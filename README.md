@@ -1,3 +1,3 @@
-taller
+Proyecto Maquina Termoformadora
 ======
-hola hola hola, prbandoffhe
+[Wiki del proyecto](https://github.com/diegob94/taller/wiki)
