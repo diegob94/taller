@@ -6,7 +6,7 @@
 
 LiquidCrystal lcd(10, 9, 5, 6, 7, 8);
 ClickEncoder *encoder;
-int16_t value,pas;
+unsigned long value,pas;
 
 void timerIsr() {
   encoder->service();
@@ -33,7 +33,7 @@ enum enumestado {
   STAP, WARM };
 enumestado estado=STAP;
 unsigned long t0=0;
-int dt=0;
+unsigned long dt=0;
 void loop() {
   switch(estado){
   case STAP:
@@ -54,13 +54,17 @@ void loop() {
         if(b==ClickEncoder::Clicked){
           digitalWrite(13,HIGH);
           t0=millis();
-          dt=int(tiempo)*1000;
+          dt=(unsigned long)tiempo*1000;
+          Serial.println(dt);
           value=0;
+          tiempo=0.0;
           estado=WARM;
         }
       }
       lcd.setCursor(0,0);
       lcd.print("Tiempo");
+      lcd.setCursor(0,1);
+      lcd.print("                ");
       lcd.setCursor(0,1);
       lcd.print(tiempo);
       break;
@@ -71,8 +75,19 @@ void loop() {
         lcd.setCursor(0,0);
         lcd.print("Tiempo");
         lcd.setCursor(0,1);
+        lcd.print("                ");
+        lcd.setCursor(0,1);
         lcd.print(float(dt-millis()+t0)/1000.0);
-      } else {
+        ClickEncoder::Button b = encoder->getButton();
+        if (b != ClickEncoder::Open) {
+          if(b==ClickEncoder::Clicked){
+            digitalWrite(13,LOW);
+            dt=0;
+            estado=STAP;
+          }
+        }
+      } 
+      else {
         digitalWrite(13,LOW);
         dt=0;
         estado=STAP;
@@ -80,4 +95,11 @@ void loop() {
       break;
     }
   }
+}
+
+float roundf(float f,float pres){
+    return (float) (floor(f*(1.0f/pres) + 0.5)/(1.0f/pres));
+}
+void pantalla(float num,int dec, int fila){
+  
 }
